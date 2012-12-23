@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IFPkgDescriptionDescription</key>
+	<string>AuthSight uses your iSight camera to photograph failed login attempts at the login and screen saver prompts. Camera snapshots are stored in /var/log/AuthSight, and can optionally be emailed with networking information. Run the "Configure AuthSight" script to set this up.</string>
+	<key>IFPkgDescriptionTitle</key>
+	<string>AuthSight</string>
+</dict>
+</plist>

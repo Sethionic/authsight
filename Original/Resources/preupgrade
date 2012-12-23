@@ -1,0 +1,4 @@
+#!/bin/sh
+
+/bin/launchctl stop com.zdziarski.authsight
+/bin/launchctl unload /Library/LaunchDaemons/authsight.plist

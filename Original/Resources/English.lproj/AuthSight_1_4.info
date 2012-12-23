@@ -1,0 +1,17 @@
+Title AuthSight
+Version 
+Description AuthSight uses your iSight camera to photograph failed login attempts at the login and screen saver prompts. Camera snapshots are stored in /var/log/AuthSight, and can optionally be emailed with networking information. Run the "Configure AuthSight" script to set this up.
+DefaultLocation /
+DeleteWarning 
+
+### Package Flags
+
+NeedsAuthorization YES
+Required NO
+Relocatable NO
+RequiresReboot NO
+UseUserMask NO
+OverwritePermissions NO
+InstallFat NO
+RootVolumeOnly NO
+OnlyUpdateInstalledLanguages NO
