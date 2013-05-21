@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#The orignal perl script behind authsight
+#The original perl script behind authsight
 
 use strict;
 use IO::Handle;
