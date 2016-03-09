@@ -1,15 +1,14 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use IO::Handle;
 use MIME::Base64;
 use File::stat;
 use vars qw { $IMAGESNAP $LOGDIR $LOGFILE $LAST $EMAIL $AIRPORT $IFCONFIG };
-require "ctime.pl";
 
 $| = 1;
 
-$IMAGESNAP     = "/usr/libexec/imagesnap";
+$IMAGESNAP     = "/usr/local/bin/imagesnap";
 $LOGDIR        = "/var/log/AuthSight";
 $LOGFILE       = "/var/audit/current";
 $EMAIL         = "";
@@ -30,9 +29,10 @@ for (;;) {
     while(<TAIL>) {
         chomp;
         my($user) = "";
-        if ( (/user authentication,.*,text,Authentication for user <([A-Za-z]*)>,return,failure/i) or 
-		(/SecSrvr authinternal mech,.*,text,user <([A-Za-z]*)>,return,failure/i) or
-		(/SecSrvr authinternal mech,.*,text,Error opening DS node for user <([A-Za-z]*)>,return,failure/i)
+        if ( (/user authentication,.*,text,Authentication for user <([A-Za-z0-9]*)>,return,failure/i) or 
+		(/user authentication,.*,text,Verify password for record type Users '([A-Za-z0-9]*)'.*,return,failure/i) or
+		(/SecSrvr authinternal mech,.*,text,user <([A-Za-z0-9]*)>,return,failure/i) or
+		(/SecSrvr authinternal mech,.*,text,Error opening DS node for user <([A-Za-z0-9]*)>,return,failure/i)
 	) {
             if (defined($1)) {
                $user = $1;
@@ -81,7 +81,7 @@ for (;;) {
 
 sub log {
   my($msg) = @_;
-  my($time) = ctime(time);
+  my($time) = time;
   my(@proc) = split(/\//, $0);
   my($procname) = $proc[$#proc];
   chomp $msg;
