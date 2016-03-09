@@ -1,18 +1,17 @@
 #!/usr/bin/perl
-#The original perl script behind authsight
 
 use strict;
 use IO::Handle;
 use MIME::Base64;
 use File::stat;
-use vars qw { $ISIGHTCAPTURE $LOGDIR $LOGFILE $LAST $EMAIL $AIRPORT $IFCONFIG };
+use vars qw { $IMAGESNAP $LOGDIR $LOGFILE $LAST $EMAIL $AIRPORT $IFCONFIG };
 require "ctime.pl";
 
 $| = 1;
 
-$ISIGHTCAPTURE = "/opt/local/bin/isightcapture";
+$IMAGESNAP     = "/usr/libexec/imagesnap";
 $LOGDIR        = "/var/log/AuthSight";
-$LOGFILE       = "/var/log/secure.log";
+$LOGFILE       = "/var/audit/current";
 $EMAIL         = "";
 $IFCONFIG      = "/sbin/ifconfig";
 $AIRPORT       = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport";
@@ -26,25 +25,31 @@ if ($EMAIL eq "") {
 } else { 
     &log("logging and reporting to $EMAIL");
 }
-open(TAIL, "$LOGFILE");
-while(<TAIL>) { }
+open(TAIL, "audit -n ; sleep 1 ; tail -F $LOGFILE | praudit -l|");
 for (;;) {
-
     while(<TAIL>) {
         chomp;
-        if (/failed to authenticate user ([A-Z]*)/i) { ###For 10.6, use /var/log/secure.log
-            my($user) = $1;
-            if ($LAST eq $_) {
-                $LAST = $_;
-                &log("strange dupe error. ignoring: $_");
+        my($user) = "";
+        if ( (/user authentication,.*,text,Authentication for user <([A-Za-z]*)>,return,failure/i) or 
+		(/SecSrvr authinternal mech,.*,text,user <([A-Za-z]*)>,return,failure/i) or
+		(/SecSrvr authinternal mech,.*,text,Error opening DS node for user <([A-Za-z]*)>,return,failure/i)
+	) {
+            if (defined($1)) {
+               $user = $1;
+               if ($LAST eq $_) {
+                   $LAST = $_;
+                   &log("strange dupe error. ignoring: $_");
+               }
+               $LAST = $_;
+	    } else {
+               $user="unknown";
             }
-            $LAST = $_;
             my($sec, $min, $hour, $day, $mon, $year) = (localtime(time));
             $year += 1900;
             $mon  ++;
             my($date) = sprintf("%02d-%02d-%04d_%02d.%02d.%02d", $mon, $day, $year, $hour, $min, $sec);
             my($file) = "$LOGDIR/$user\_$date.jpg";
-            my($result) = `osascript -e 'do shell script "$ISIGHTCAPTURE $file"'`;
+            my($result) = `osascript -e 'do shell script "$IMAGESNAP $file"' >> /var/log/authsight.log`;
             chomp($result);
             &log("CAPTURE ON $_");
             &log("$file $result");
@@ -60,7 +65,7 @@ for (;;) {
                 close(FILE);
                 &email($data);
             }
-        }
+	}
     }
 
     select(undef, undef, undef, .20);
@@ -68,8 +73,7 @@ for (;;) {
     if (stat(*TAIL)->nlink == 0) {
         &log("re-opening $LOGFILE on new filehandle");
         close(TAIL);
-        open(TAIL, $LOGFILE) || &log("failed to re-open file: $!");
-        while(<TAIL>) { }
+        open(TAIL, "audit -n ; sleep 1 ; tail -F $LOGFILE | praudit -l|") || &log("failed to re-open file: $!");
         &log("file re-oened");
     }
     seek(TAIL, 0, 1);
