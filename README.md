@@ -8,10 +8,12 @@ Uses imagesnap from http://iharder.sourceforge.net/current/macosx/imagesnap/ to 
 Installation
 ============
 
+With prepackaged installer
 1. Download AuthSight.pkg and run it. 
 
 OR
 
+Do it yourself
 1. Download imagesnap from http://prdownloads.sourceforge.net/iharder/ImageSnap-v0.2.5.tgz
 2. Copy imagesnap to /usr/local/bin and make executable.
 3. Copy the authsightd.pl to /usr/local/bin and make executable.
