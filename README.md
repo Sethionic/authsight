@@ -10,7 +10,7 @@ Installation
 
 **With prepackaged installer**
 
-1. Download AuthSight.pkg from this repo and run it. 
+1. Download [AuthSight.pkg](https://github.com/sck-nogas/authsight/blob/master/AuthSight.pkg?raw=true) from this repo and run it. 
 
 OR
 
