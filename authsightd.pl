@@ -44,14 +44,13 @@ for (;;) { # Loop indefinitely, incase auditpipe is closed
    my $remaining_bytes;
    while ($sel->can_read()) {
       my $rv = sysread($fh, $buf, READ_SIZE, length($buf)); &log("Failed to fill buffer $!\n") if !defined($rv); last if !$rv;
-      while ($buf =~ s/^(.{$HEADER_SIZE})//s) {
+      while ($buf) {
+         my $msg = substr($buf,0,$HEADER_SIZE, "");
          my($user) = "";
-         my $msg=$1;
          my ($header_token_ID, $header_byte_count, $header_version, $header_event_type, $header_event_modifier, $header_epoch_seconds, $header_milliseconds ) = unpack 'H2 H8 H2 H4 H4 H8 H8', $msg;
          $remaining_bytes = hex($header_byte_count) - $HEADER_SIZE ;
          if (length($buf) < $remaining_bytes) { my $rv = sysread($fh, $buf, READ_SIZE, length($buf)); &log("Failed to fill buffer $!\n") if !defined($rv); last if !$rv; }
-         $buf =~ s/^(.{$remaining_bytes})//s;
-         my ($remainder_of_record)=$1;
+         my ($remainder_of_record)= substr ($buf,0,$remaining_bytes, "");
          if (hex($header_event_type) eq "45023") {
             if ( ($remainder_of_record =~ /.*Authentication for user <([A-Za-z0-9]*)\x0\x27[^\x0]>/i) or 
                  ($remainder_of_record =~ /.*Verify password for record type Users '([A-Za-z0-9]*)'.*\x0\x27[^\x0]/i) or
