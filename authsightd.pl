@@ -19,7 +19,7 @@ $EMAIL         = "";
 $IFCONFIG      = "/sbin/ifconfig";
 $AIRPORT       = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport";
 my $HEADER_SIZE = 18;
-use constant READ_SIZE => 16*1024;
+use constant READ_SIZE => 64*1024;
 
 #Start of code
 mkdir($LOGDIR) if (! -d $LOGDIR);
